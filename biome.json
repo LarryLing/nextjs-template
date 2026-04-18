@@ -37,7 +37,7 @@
     "rules": {
       "recommended": true,
       "nursery": {
-        "useExplicitReturnType": "warn"
+        "useExplicitType": "warn"
       },
       "performance": {
         "noBarrelFile": "error"
