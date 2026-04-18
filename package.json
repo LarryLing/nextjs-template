@@ -32,5 +32,6 @@
       "biome check --files-ignore-unknown=true",
       "biome check --write --no-errors-on-unmatched"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.31.1"
 }
