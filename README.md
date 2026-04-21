@@ -2,7 +2,11 @@
 
 ## ShadCN/ui
 
-UI styling and components are handled with the ShadCN/ui component library.
+UI styling and components are handled with the [ShadCN/ui component library](https://ui.shadcn.com/docs).
+
+### Components
+
+See the [component docs](https://ui.shadcn.com/docs/components) for a list of available components.
 
 ### Custom Theming
 
