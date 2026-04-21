@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js Template
 
-## Getting Started
+## ShadCN/ui
 
-First, run the development server:
+UI styling and components are handled with the ShadCN/ui component library.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Custom Theming
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+To customize colors, borders, fonts, etc., use the [TweakCN theme editor](https://tweakcn.com/editor/theme). Click _Code_, then copy and run the `pnpm` command to apply your theme.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Icons
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Use the [Lucide icon library](https://lucide.dev/icons/) for consistency. Exceptions are acceptable only if an icon doesn't exist in Lucide.
 
-## Learn More
+### Skills and MCP
 
-To learn more about Next.js, take a look at the following resources:
+This template includes the ShadCN/ui builder skill and Cursor MCP server for finding, installing, and composing components.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Example prompts:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- "Add a login form with email and password fields."
+- "Create a settings page with a profile update form."
+- "Build a dashboard with a sidebar, stats cards, and a data table."
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To enable, open _Cursor Settings_ and enable the MCP server. See the [skill docs](https://ui.shadcn.com/docs/skills) and [MCP docs](https://ui.shadcn.com/docs/mcp) for more details.
