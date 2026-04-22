@@ -5,7 +5,7 @@
       "args": ["shadcn@latest", "mcp"]
     },
     "supabase": {
-      "url": "https://mcp.supabase.com/mcp?project_ref=veqfvmxckatlwswfwqtw&read_only=true"
+      "url": "http://127.0.0.1:54321/mcp"
     }
   }
 }
