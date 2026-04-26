@@ -70,13 +70,25 @@
                 "selector": {
                   "kind": "variable"
                 },
-                "formats": ["camelCase"]
+                "formats": ["camelCase", "PascalCase"]
               },
               {
                 "selector": {
                   "kind": "functionParameter"
                 },
                 "formats": ["camelCase"]
+              },
+              {
+                "selector": {
+                  "kind": "function"
+                },
+                "formats": ["camelCase", "PascalCase"]
+              },
+              {
+                "selector": {
+                  "kind": "objectLiteralProperty"
+                },
+                "formats": ["camelCase", "CONSTANT_CASE"]
               }
             ]
           }
