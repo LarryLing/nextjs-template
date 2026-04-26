@@ -2,7 +2,13 @@ name: Code quality
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: code-quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   quality:
@@ -18,12 +24,12 @@ jobs:
           persist-credentials: false
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -32,7 +38,10 @@ jobs:
       - name: Setup Biome
         uses: biomejs/setup-biome@v2
         with:
-          version: latest
+          version: "2.4.12"
 
       - name: Run Biome
         run: biome ci .
+
+      - name: Run type check
+        run: pnpm run type-check

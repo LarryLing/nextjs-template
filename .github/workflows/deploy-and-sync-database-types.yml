@@ -1,0 +1,72 @@
+name: Deploy and sync database types
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'supabase/migrations/*.sql'
+
+concurrency:
+  group: deploy-and-sync-database-types-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with: { version: latest }
+
+      - name: Deploy to development
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          supabase link --project-ref ${{ secrets.DEVELOPMENT_PROJECT_ID }}
+          supabase db push
+
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/main'
+        run: |
+          supabase link --project-ref ${{ secrets.PRODUCTION_PROJECT_ID }}
+          supabase db push
+
+  sync-types:
+    needs: deploy
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Generate types from development
+        run: |
+          supabase gen types typescript --project-id ${{ secrets.DEVELOPMENT_PROJECT_ID }} > database.types.ts
+
+      - name: Detect type changes
+        id: types_diff
+        run: |
+          if git diff --quiet -- database.types.ts; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit updated types
+        if: steps.types_diff.outputs.changed == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: sync types with database schema"
+          file_pattern: database.types.ts
