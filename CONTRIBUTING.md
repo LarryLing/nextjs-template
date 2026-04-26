@@ -335,6 +335,8 @@ When submitting a Pull Request, ensure:
 
 Backend operations are handled using [Supabase](https://supabase.com/docs).
 
+The full Supabase CLI reference can be found [here](https://supabase.com/docs/reference/cli/supabase-db).
+
 ### Environment Overview
 
 This project uses **three Supabase environments**:
@@ -455,7 +457,19 @@ All schema changes must be authored locally and promoted through development bef
    pnpx supabase db reset
    ```
 
-The full Supabase CLI reference can be found [here](https://supabase.com/docs/reference/cli/supabase-db).
+### Type Generation
+
+The Supabase CLI supports generating types directly from the database schema via the following command:
+
+```bash
+pnpx supabase gen types typescript --local > database.types.ts
+```
+
+Because you will be working with the local database during feature development, be sure to include the `--local` flag.
+
+This will dump the type definitions into the `database.types.ts` file. _Do not_ modify this file manually.
+
+You should be running this command as necessary to keep your types in sync with the database schema. If you forget to run this command for any reason, this repository has a GitHub action for generating and commiting a new `database.types.ts` file if a new `.sql` file is added.
 
 ### Row-Level Security Policies
 
