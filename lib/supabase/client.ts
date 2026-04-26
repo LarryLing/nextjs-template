@@ -1,6 +1,6 @@
-import { env } from "@lib/env";
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { env } from "@/lib/env";
 import type { Database } from "../../schema.gen";
 
 export const createClient = (): SupabaseClient<Database> => {
