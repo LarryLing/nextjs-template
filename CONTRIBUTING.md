@@ -349,6 +349,19 @@ This project uses **three Supabase environments**:
 
 Contributors should **never** push schema changes directly to the production or development remote projects. All schema changes must go through the local → development → production pipeline described below.
 
+### GitHub Secrets
+
+The CI/CD workflows require two repository secrets to deploy migrations to the correct Supabase projects. These must be configured before the release workflow can run.
+
+In your GitHub repository, go to _Settings → Secrets and variables → Actions_ and add the following:
+
+| Secret                   | Value                                               |
+| ------------------------ | --------------------------------------------------- |
+| `PRODUCTION_PROJECT_ID`  | The project ID of your production Supabase project  |
+| `DEVELOPMENT_PROJECT_ID` | The project ID of your development Supabase project |
+
+Your project ID can be retrieved from the Supabase dashboard URL: `https://supabase.com/dashboard/project/<project-id>`
+
 ### Vercel Environment
 
 We recommend handling deployment with Vercel given its close integration with Next.js and ease of configuration, especially with environment variables.
@@ -425,6 +438,8 @@ All schema changes must be authored locally and promoted through development bef
    ```bash
    pnpx supabase db diff -f example_migration_name
    ```
+
+   **DO NOT** forget to run the `diff` command if you make changes through the Supabase Studio. Otherwise, the CI/CD step will run incorrectly. It is for this reason that we **highly recommend** make changes via migration files whenever possible.
 
    > **Important**: Our Supabase environment variable names are prefixed with `NEXT_PUBLIC_`, meaning they are exposed to the browser. You **must** add [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) policies to any new tables, or your data will be publicly accessible.
 

@@ -1,0 +1,24 @@
+name: Deploy Supabase
+on:
+  push:
+    branches: [main, develop]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with: { version: latest }
+
+      - name: Deploy to development 
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          supabase link --project-ref ${{ secrets.DEVELOPMENT_PROJECT_ID }}
+          supabase db push
+
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/main'
+        run: |
+          supabase link --project-ref ${{ secrets.PRODUCTION_PROJECT_ID }}
+          supabase db push
