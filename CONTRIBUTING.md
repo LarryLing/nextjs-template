@@ -362,7 +362,7 @@ In your GitHub repository, go to _Settings → Secrets and variables → Actions
 
 Your project ID can be retrieved from the Supabase dashboard URL: `https://supabase.com/dashboard/project/<project-id>`
 
-### Vercel Environment
+### Vercel Deployment
 
 We recommend handling deployment with Vercel given its close integration with Next.js and ease of configuration, especially with environment variables.
 
@@ -390,8 +390,6 @@ The `/supabase` directory contains migrations, functions, config, and seed data.
 
    This creates a `supabase/migrations/<timestamp>_remote_schema.sql` file reflecting the current production schema.
 
-   > **Warning**: Never run `supabase db push` while linked to the production project. Run `pnpx supabase status` to verify which project you are currently linked to.
-
 2. **Sync the pulled schema to the development remote:**
 
    ```bash
@@ -401,18 +399,12 @@ The `/supabase` directory contains migrations, functions, config, and seed data.
 
    Your development environment is now in sync with production.
 
+   > **Warning**: Never run `supabase db push` while linked to the production project. Run `pnpx supabase status` to verify which project you are currently linked to.
+
 3. **Start local Supabase services:**
 
    ```bash
    pnpx supabase start
-   ```
-
-   This will print local URLs and keys for your running Supabase instance. Copy the `API URL` and `anon key` values into your `.env.local`:
-
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<anon key from output>
-   APP_ENV=development
    ```
 
 4. **Stop local services when done:**
@@ -590,7 +582,7 @@ UI styling and components are handled with the [ShadCN/ui component library](htt
 
 See the [component docs](https://ui.shadcn.com/docs/components) for a list of available components.
 
-**Important**: Do not modify files in `components/ui/` directly. If you need to customize a component, create a wrapper component.
+> **Important**: Do not modify files in `components/ui/` directly. If you need to customize a component, create a wrapper component.
 
 #### Custom Theming
 
