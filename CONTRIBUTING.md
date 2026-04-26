@@ -475,6 +475,19 @@ You should be running this command as necessary to keep your types in sync with 
 
 All tables must have RLS enabled. See the [Supabase RLS docs](https://supabase.com/docs/guides/database/postgres/row-level-security) for guidance on writing policies.
 
+### Skills and MCP
+
+This template includes the `supabase` and `supabase-postgres-best-practices` skills and Cursor MCP server for assisting with backend development.
+
+Example prompts:
+
+- "Design a `<description>` schema. Use lowercase for all names, include primary keys and foreign keys with `_id` suffixes, and enable RLS on every table."
+- "Create RLS policies for a `posts` table. Allow public `SELECT` access, but restrict `INSERT`, `UPDATE`, and `DELETE` to the owner of the post identified by `auth.uid()`."
+
+To enable the MCP server, ensure your local development environment is running, open _Cursor Settings_ and enable the `supabase` option. You will then be prompted to login.
+
+The MCP server will be accessible through the following URL: `http://localhost:54321/mcp`
+
 ## Component Development
 
 ### Server Components vs Client Components
@@ -582,7 +595,9 @@ Example prompts:
 - "Create a settings page with a profile update form."
 - "Build a dashboard with a sidebar, stats cards, and a data table."
 
-To enable, open _Cursor Settings_ and enable the MCP server. See the [skill docs](https://ui.shadcn.com/docs/skills) and [MCP docs](https://ui.shadcn.com/docs/mcp) for more details.
+To enable the MCP server, open _Cursor Settings_ and enable the `shadcn` option.
+
+See the [skill docs](https://ui.shadcn.com/docs/skills) and [MCP docs](https://ui.shadcn.com/docs/mcp) for more details.
 
 ## Hooks Development
 
