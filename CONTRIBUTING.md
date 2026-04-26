@@ -22,7 +22,7 @@ Thank you for your interest in contributing to the Next.js template! This guide 
 
 ### Prerequisites
 
-- **Node.js**: Version 18 or higher
+- **Node.js**: Version 20 or higher
 - **pnpm**: Version 10.33.0 (specified in `package.json`)
 - **Git**: For version control
 - **Docker**: For Supabase local development
@@ -254,13 +254,15 @@ docs: update contributing guide with barrel import examples
 
 Commit messages are validated with [commitlint](https://commitlint.js.org).
 
-### Husky Commit Hooks
+### Husky Git Hooks
 
-This template uses [Husky](https://typicode.github.io/husky/) and [lint-staged](https://github.com/lint-staged/lint-staged) for pre-commit and pre-build hooks.
+This template uses [Husky](https://typicode.github.io/husky/), [lint-staged](https://github.com/lint-staged/lint-staged), and [commitlint](https://commitlint.js.org/) to enforce quality checks before code is pushed.
 
-During the pre-commit step, Husky will invoke Biome's `check` command to apply lint and format fixes. Any lint errors that could not be fixed will be raised and the commit process will abort.
+- **pre-commit**: Runs `lint-staged`, which applies Biome checks/fixes to staged files (`biome check --write`) and then verifies them.
+- **pre-push**: Runs `pnpm run type-check` (`tsc --noEmit`) to catch TypeScript errors before pushing.
+- **commit-msg**: Runs commitlint to validate conventional commit message format.
 
-During the pre-build step, Husky will invoke the type check command. If any TypeScript errors exist, they will be raised and the commit process will abort.
+If any hook fails, the Git action is blocked until the issue is resolved.
 
 ### Pull Request Process
 
@@ -289,7 +291,7 @@ During the pre-build step, Husky will invoke the type check command. If any Type
    git push origin feature/your-username/feature-name
    ```
 
-5. **Ensure CI passes** — The CI workflow will validate linting, formatting, type checking, and run your migrations against a local Supabase instance.
+5. **Ensure automation passes** — PRs into `develop` or `main` run the `Code quality` workflow (`biome ci .` and `pnpm run type-check`). On push to `develop`/`main` with migration file changes, Supabase deployment and database type-sync workflows run automatically.
 
 6. **Address review feedback** — Make requested changes and push updates to your branch.
 
@@ -331,6 +333,24 @@ When submitting a Pull Request, ensure:
 - [ ] Write clear commit messages following conventional commit format
 - [ ] If schema changes are included, confirm `supabase db reset` passes locally
 
+## Vercel Deployment
+
+We recommend handling deployment with Vercel given its close integration with Next.js and ease of configuration, especially with environment variables.
+
+### Environment Variables
+
+Wherever applicable, configure the environment variables so that your **production** variables are only accessible from the production deployment, and your **development** variables are only accessible on preview or development deployments.
+
+More information on environment variable management can be found [here](https://vercel.com/docs/environment-variables).
+
+### Whitelisted Deployments
+
+This repository includes a script that allows deployments from the `main` and `develop` branches, and also allows Pull Request preview deployments.
+
+This keeps production promotion strict through long-lived branches while still enabling fast visual QA and stakeholder review on PR previews.
+
+The script logic can be found in the `vercel-ignore.sh` file.
+
 ## Backend Development
 
 Backend operations are handled using [Supabase](https://supabase.com/docs).
@@ -351,24 +371,21 @@ Contributors should **never** push schema changes directly to the production or 
 
 ### GitHub Secrets
 
-The CI/CD workflows require two repository secrets to deploy migrations to the correct Supabase projects. These must be configured before the release workflow can run.
+The `deploy-and-sync-database-types` workflow requires repository secrets for Supabase authentication and branch-specific project targeting. These must be configured before CI/CD can deploy migrations or generate remote database types.
 
 In your GitHub repository, go to _Settings → Secrets and variables → Actions_ and add the following:
 
 | Secret                   | Value                                               |
 | ------------------------ | --------------------------------------------------- |
+| `SUPABASE_ACCESS_TOKEN`  | Personal access token used by Supabase CLI in CI    |
 | `PRODUCTION_PROJECT_ID`  | The project ID of your production Supabase project  |
 | `DEVELOPMENT_PROJECT_ID` | The project ID of your development Supabase project |
 
+The Supabase CLI reads `SUPABASE_ACCESS_TOKEN` from environment variables automatically, so you do not pass the token as a command argument in workflow steps.
+
+A single access token can be used for both development and production projects. If you want stricter isolation, you can use separate environment-scoped tokens in GitHub Environments.
+
 Your project ID can be retrieved from the Supabase dashboard URL: `https://supabase.com/dashboard/project/<project-id>`
-
-### Vercel Deployment
-
-We recommend handling deployment with Vercel given its close integration with Next.js and ease of configuration, especially with environment variables.
-
-Configure the Vercel project so that your **production** environment variables are only accessible from the production deployment, and your **development** environment variables are only accessible on preview or development deployments.
-
-More information on environment variable management can be found [here](https://vercel.com/docs/environment-variables).
 
 ### Getting Started With Local Development
 
@@ -425,21 +442,23 @@ All schema changes must be authored locally and promoted through development bef
 
    This creates `supabase/migrations/<timestamp>_example_migration_name.sql`. Write your DDL statements in this file.
 
-   Alternatively, make changes via Supabase Studio (`localhost:54323`) and auto-generate the migration:
-
-   ```bash
-   pnpx supabase db diff -f example_migration_name
-   ```
-
-   **DO NOT** forget to run the `diff` command if you make changes through the Supabase Studio. Otherwise, the CI/CD step will run incorrectly. It is for this reason that we **highly recommend** make changes via migration files whenever possible.
+   > **Quote from Supabase documentation**: "The golden rule: never change the remote database directly. Once you're using migrations, all schema changes — even small ones — should go through migration files. Using the Dashboard's SQL editor or Table Editor on your remote database bypasses the migration history, and db push will start failing with sync errors."
 
    > **Important**: Our Supabase environment variable names are prefixed with `NEXT_PUBLIC_`, meaning they are exposed to the browser. You **must** add [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) policies to any new tables, or your data will be publicly accessible.
 
-2. **Add seed data (if applicable):**
+2. ** Apply migration:**
+
+   Run the new migration to update the local database schema
+
+   ```bash
+   pnpx supabase migration up
+   ```
+
+3. **Add seed data (if applicable):**
 
    Provide mock data in `/supabase/seed.sql`. This file is tracked by Git and will be applied automatically when other contributors run `db reset`.
 
-3. **Test your migration locally:**
+4. **Test your migration locally:**
 
    ```bash
    pnpx supabase db reset
@@ -447,11 +466,11 @@ All schema changes must be authored locally and promoted through development bef
 
    This wipes the local database, re-applies all migrations in `/supabase/migrations` in order, and re-seeds from `seed.sql`. If `reset` succeeds locally, the migration is safe to promote.
 
-4. **Promote to development, then production:**
+5. **Promote to development, then production:**
 
    Follow the [Pull Request Process](#pull-request-process) — open a PR into `develop`, verify the development environment, then PR into `main` for production.
 
-5. **Rebase if a teammate merges a migration first:**
+6. **Rebase if a teammate merges a migration first:**
 
    If a new migration lands on `develop` while you have local changes, rename your migration file with a later timestamp so it applies after:
 
@@ -476,7 +495,7 @@ Because you will be working with the local database during feature development, 
 
 This will dump the type definitions into the `database.types.ts` file. _Do not_ modify this file manually.
 
-You should be running this command as necessary to keep your types in sync with the database schema. If you forget to run this command for any reason, this repository has a GitHub action for generating and commiting a new `database.types.ts` file if a new `.sql` file is added.
+You should be running this command as necessary to keep your types in sync with the database schema. If you forget to run this command for any reason, this repository has a GitHub action for generating and committing a new `database.types.ts` file if a new `.sql` file is added.
 
 ### Row-Level Security Policies
 
